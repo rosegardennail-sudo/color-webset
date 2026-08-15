@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b86f7e">
+<title>Rose Garden Colors</title>
+<style>
+:root{--bg:#f7f1ee;--card:#fffdfa;--ink:#2f2927;--muted:#81736f;--line:#eaded8;--accent:#b86f7e;--soft:#f1dde2;--green:#4f9c70;--yellow:#c99a2d;--orange:#d7763f;--red:#c95454;--shadow:0 8px 24px rgba(80,55,48,.07)}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#fbf8f6,#f5eeea);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:560px;margin:auto;min-height:100vh;padding:18px 16px calc(100px + env(safe-area-inset-bottom))}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+h1{margin:0;font-size:25px}.sub,.muted{color:var(--muted);font-size:13px}
+.avatar{width:44px;height:44px;border-radius:15px;background:var(--soft);display:grid;place-items:center;font-size:22px}
+.topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sync{display:flex;align-items:center;gap:6px;color:var(--green);font-size:12px;font-weight:750}
+.logout{border:1px solid var(--line);background:white;border-radius:12px;padding:8px 10px;font-size:12px}
+.search{display:flex;gap:7px;align-items:center;background:white;border:1px solid var(--line);border-radius:18px;padding:11px 12px;box-shadow:var(--shadow)}
+.search input{border:0;outline:0;flex:1;min-width:0;background:transparent;font-size:15px}
+.btn{border:0;background:var(--accent);color:white;border-radius:14px;padding:10px 12px;font-weight:800}
+.clear{border:0;background:transparent;color:var(--muted);font-size:18px;padding:3px 6px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.stat{width:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:left;color:var(--ink);box-shadow:0 2px 8px rgba(80,55,48,.03)}
+.stat:active{transform:scale(.985);background:var(--soft)}.stat b{font-size:22px;display:block}.stat span{font-size:12px;color:var(--muted)}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.action{border:1px solid var(--line);background:white;border-radius:18px;padding:15px;text-align:left;color:var(--ink)}
+.action:active{background:var(--soft)}.action b{display:block;margin-top:5px}.action small{color:var(--muted)}
+.section{display:flex;justify-content:space-between;align-items:center;margin:20px 2px 10px}
+.section h2{font-size:16px;margin:0}.link{border:0;background:transparent;color:var(--accent);font-weight:800}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:19px;padding:12px;box-shadow:0 2px 8px rgba(80,55,48,.025)}
+.card:active{background:#fff8f5}.swatch{width:58px;height:58px;border-radius:17px;border:1px solid rgba(0,0,0,.08);object-fit:cover;background:linear-gradient(135deg,#eee,#ddd)}
+.meta b{display:block;font-size:15px}.meta small{display:block;color:var(--muted);margin-top:3px}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.badge{font-size:11px;padding:4px 7px;border-radius:999px;background:#f1ebe8}
+.ok{background:#e6f4ea;color:#267648}.warn{background:#fff0dd;color:#9d5926}.bad{background:#fde7e7;color:#a53e3e}.chev{font-size:24px;color:#b7aaa5}
+.empty{padding:28px;text-align:center;color:var(--muted);background:white;border:1px dashed var(--line);border-radius:18px}
+.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));width:min(528px,calc(100% - 24px));background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:21px;padding:7px;display:grid;grid-template-columns:repeat(4,1fr);z-index:20;box-shadow:var(--shadow)}
+.nav{border:0;background:transparent;border-radius:14px;padding:9px 4px;color:var(--muted);font-size:11px}.nav.active{background:var(--soft);color:#7d4050;font-weight:800}
+.modal{position:fixed;inset:0;background:rgba(42,33,30,.45);display:none;align-items:flex-end;justify-content:center;padding:10px;z-index:40}
+.sheet{width:min(560px,100%);background:#fffaf7;border-radius:27px 27px 18px 18px;padding:18px;max-height:90vh;overflow:auto}
+.handle{width:48px;height:5px;background:#ddd0ca;border-radius:999px;margin:0 auto 16px}
+.sheet h3{margin:0 0 5px;font-size:21px}.sheet p{margin:0 0 14px;color:var(--muted);font-size:13px}
+.field{margin:11px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:white;border-radius:13px;padding:11px 12px;outline:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.primary{width:100%;border:0;background:var(--accent);color:white;border-radius:15px;padding:13px;font-weight:850;margin-top:11px}
+.secondary{width:100%;border:1px solid var(--line);background:white;border-radius:15px;padding:12px;font-weight:750;margin-top:8px;color:var(--ink)}.danger{color:#a53e3e}
+.auth{max-width:430px;margin:45px auto;background:white;border:1px solid var(--line);border-radius:24px;padding:22px}
+.auth h2{margin-top:0}.authTabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.authTabs button{border:1px solid var(--line);background:white;border-radius:12px;padding:9px}.authTabs .active{background:var(--soft)}
+.detailHead{display:grid;grid-template-columns:92px 1fr;gap:14px;align-items:start}.detailImg{width:92px;height:92px;border-radius:22px;object-fit:cover;background:#ddd;border:1px solid var(--line)}
+.detailRow{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}.detailRow span:first-child{color:var(--muted)}
+.statusGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.statusGrid button{border:1px solid var(--line);background:white;border-radius:12px;padding:9px 3px;font-size:12px}
+.statusGrid button:active{background:var(--soft)}.camBox{border:2px dashed #d7c3be;border-radius:22px;padding:18px;text-align:center;background:#fffdfc}
+.preview{width:100%;max-height:240px;object-fit:contain;border-radius:16px;margin-top:10px;display:none}.ocr{background:#f8efec;border-radius:16px;padding:12px;margin-top:12px;font-size:13px;white-space:pre-wrap;text-align:left}
+.shopItem{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.shopItem:last-child{border-bottom:0}
+.copyBtn{border:1px solid var(--line);background:white;border-radius:12px;padding:9px 10px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#2f2927;color:white;padding:10px 14px;border-radius:999px;font-size:12px;z-index:80;display:none}
+</style>
+</head>
+<body>
+
+<div id="authView" class="auth">
+  <h2>Rose Garden 颜色库存 💅</h2>
+  <p class="muted">登录后，iPhone、iPad、电脑都会同步同一套颜色库存。</p>
+  <div class="authTabs">
+    <button id="loginTab" class="active" onclick="setAuthMode('login')">登录</button>
+    <button id="signupTab" onclick="setAuthMode('signup')">首次注册</button>
+  </div>
+  <div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
+  <div class="field"><label>密码</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="至少 6 位"></div>
+  <button class="primary" id="authBtn" onclick="submitAuth()">登录</button>
+  <button class="secondary" id="resendBtn" style="display:none" onclick="resendConfirmation()">重新发送确认邮件</button>
+  <p id="authMsg" class="muted" style="margin-top:10px"></p>
+</div>
+
+<div id="mainView" class="app" style="display:none">
+  <div class="header">
+    <div><h1>Rose Garden Colors</h1><div class="sub" id="userLine"></div></div>
+    <div class="avatar">💅</div>
+  </div>
+
+  <div class="topline">
+    <div class="sync">● 云端同步</div>
+    <button class="logout" onclick="logout()">退出登录</button>
+  </div>
+
+  <div class="search">
+    <span>🔎</span>
+    <input id="search" placeholder="搜索店内编号、进货编码、颜色名、品牌…">
+    <button id="clearSearch" class="clear" style="display:none" onclick="clearSearchBox()">×</button>
+    <button class="btn" onclick="openAdd(true)">📷</button>
+  </div>
+
+  <div class="stats">
+    <button class="stat" onclick="setFilter('all')"><b id="sTotal">0</b><span>全部颜色</span></button>
+    <button class="stat" onclick="setFilter('low')"><b id="sLow">0</b><span>库存偏低</span></button>
+    <button class="stat" onclick="setFilter('out')"><b id="sOut">0</b><span>已缺货</span></button>
+    <button class="stat" onclick="setFilter('missing')"><b id="sMissing">0</b><span>缺少配套</span></button>
+  </div>
+
+  <div class="actions">
+    <button class="action" onclick="openAdd(true)">📷<b>拍照录入</b><small>拍瓶底识别颜色</small></button>
+    <button class="action" onclick="showShopping()">🛒<b>补货清单</b><small>自动汇总库存偏低和缺货</small></button>
+    <button class="action" onclick="setFilter('missing')">🔗<b>缺少配套</b><small>缺 Gel 或普通甲油</small></button>
+    <button class="action" onclick="openAdd(false)">➕<b>添加颜色</b><small>手动添加颜色</small></button>
+  </div>
+
+  <div class="section">
+    <h2 id="sectionTitle">All Colors · 0</h2>
+    <button class="link" onclick="showAll()">显示全部</button>
+  </div>
+  <div id="list" class="list"></div>
+</div>
+
+<div class="bottom" id="bottomNav" style="display:none">
+  <button id="navHome" class="nav active" onclick="goHome()">🏠<br>首页</button>
+  <button id="navColors" class="nav" onclick="goColors()">🎨<br>颜色</button>
+  <button id="navBuy" class="nav" onclick="showShopping()">🛒<br>补货</button>
+  <button id="navScan" class="nav" onclick="openAdd(true)">📷<br>拍照</button>
+</div>
+
+<div class="modal" id="addModal"><div class="sheet">
+  <div class="handle"></div>
+  <h3 id="addTitle">添加颜色</h3>
+  <p>保存后会立即同步到云端。</p>
+
+  <div class="camBox" id="camBox">
+    <div style="font-size:38px">📸</div>
+    <b>拍瓶底 / 上传照片</b>
+    <p class="muted">把瓶底圆形标签尽量放在画面中央。系统会自动裁切，并优先识别颜色名和色号。</p>
+    <input id="photoInput" type="file" accept="image/*" capture="environment">
+    <img id="photoPreview" class="preview">
+    <div id="ocrStatus" class="ocr" style="display:none"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="field"><label>品牌</label><input id="fBrand" placeholder="例如：OPI / DND"></div>
+    <div class="field"><label>店内编号</label><input id="fStoreNum" placeholder="例如：2213"></div>
+  </div>
+  <div class="grid2">
+    <div class="field"><label>厂家 / 进货编码</label><input id="fProductCode" placeholder="例如：GC N51 / DND 447"></div>
+    <div class="field"><label>颜色名</label><input id="fName" placeholder="例如：Let Me Bayou A Drink"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="field"><label>Gel 库存</label><select id="fGel"><option value="Plenty">充足</option><option value="Half">一半</option><option value="Low">偏低</option><option value="Out">缺货</option><option value="Not Available">没有配套</option></select></div>
+    <div class="field"><label>普通甲油库存</label><select id="fRegular"><option value="Plenty">充足</option><option value="Half">一半</option><option value="Low">偏低</option><option value="Out">缺货</option><option value="Not Available">没有配套</option></select></div>
+  </div>
+
+  <div class="grid2">
+    <div class="field"><label>色卡 / 位置</label><input id="fBook" placeholder="例如：OPI 色卡 1 · #18"></div>
+    <div class="field"><label>替代颜色</label><input id="fReplacement" placeholder="替代色号 / 名字"></div>
+  </div>
+
+  <div class="field"><label>备注</label><textarea id="fNotes" rows="2" placeholder="备注"></textarea></div>
+
+  <button class="primary" id="saveBtn" onclick="saveColor()">✓ 保存到云端</button>
+  <button class="secondary" onclick="closeModal('addModal')">取消</button>
+</div></div>
+
+<div class="modal" id="detailModal"><div class="sheet"><div class="handle"></div><div id="detail"></div></div></div>
+
+<div class="modal" id="shopModal"><div class="sheet">
+  <div class="handle"></div>
+  <h3>🛒 Shopping List</h3>
+  <p>自动列出 Gel 或 Regular 为 Low / Out 的颜色。</p>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+    <button class="copyBtn" onclick="copyShoppingList()">复制清单</button>
+  </div>
+  <div id="shopList"></div>
+  <button class="secondary" onclick="closeModal('shopModal')">关闭</button>
+</div></div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+const SUPABASE_URL='https://yizjxeffmdtxsjmxpscx.supabase.co';
+const SUPABASE_KEY='sb_publishable_sjErGkhCNybndSplIJ3tDg_55KyH9CY';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+  auth:{
+    persistSession:true,
+    autoRefreshToken:true,
+    detectSessionInUrl:true,
+    storage:window.localStorage
+  }
+});
+
+let colors=[];
+let currentUser=null;
+let filter='all';
+let editingId=null;
+let currentPhotoUrl='';
+let currentPhotoFile=null;
+let authMode='login';
+
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function isMissing(c){return c.gel_stock==='Not Available'||c.regular_stock==='Not Available'}
+function isLow(c){return c.gel_stock==='Low'||c.regular_stock==='Low'}
+function isOut(c){return c.gel_stock==='Out'||c.regular_stock==='Out'}
+function statusZh(v){
+  return ({Plenty:'充足',Half:'一半',Low:'偏低',Out:'缺货','Not Available':'没有配套'})[v]||v||'—';
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',1800)}
+function closeModal(id){document.getElementById(id).style.display='none'}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.style.display='none'}));
+
+function setAuthMode(mode){
+  authMode=mode;
+  document.getElementById('loginTab').classList.toggle('active',mode==='login');
+  document.getElementById('signupTab').classList.toggle('active',mode==='signup');
+  document.getElementById('authBtn').textContent=mode==='login'?'登录':'创建账号';
+  document.getElementById('resendBtn').style.display='none';
+  document.getElementById('authMsg').textContent='';
+}
+
+async function submitAuth(){
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const msg=document.getElementById('authMsg');
+  if(!email||!password){msg.textContent='请输入邮箱和密码。';return}
+  msg.textContent='处理中…';
+
+  let res;
+  if(authMode==='signup'){
+    res=await sb.auth.signUp({
+      email,
+      password,
+      options:{emailRedirectTo:'https://rosegardennail-sudo.github.io/color-webset/'}
+    });
+  }else{
+    res=await sb.auth.signInWithPassword({email,password});
+  }
+
+  if(res.error){
+    msg.textContent=res.error.message;
+    if(/confirm|email/i.test(res.error.message)) document.getElementById('resendBtn').style.display='block';
+    return;
+  }
+
+  if(authMode==='signup'&&!res.data.session){
+    msg.textContent='账号已创建。请去邮箱确认，然后回来登录。';
+    document.getElementById('resendBtn').style.display='block';
+  }else{
+    msg.textContent='登录成功';
+  }
+}
+
+async function resendConfirmation(){
+  const email=document.getElementById('authEmail').value.trim();
+  if(!email){document.getElementById('authMsg').textContent='先输入邮箱。';return}
+  const {error}=await sb.auth.resend({
+    type:'signup',
+    email,
+    options:{emailRedirectTo:'https://rosegardennail-sudo.github.io/color-webset/'}
+  });
+  document.getElementById('authMsg').textContent=error?error.message:'确认邮件已重新发送。';
+}
+
+async function logout(){await sb.auth.signOut()}
+
+async function loadColors(){
+  const {data,error}=await sb.from('colors').select('*').order('created_at',{ascending:false});
+  if(error){
+    document.getElementById('list').innerHTML='<div class="empty">读取数据库失败：'+esc(error.message)+'</div>';
+    return;
+  }
+  colors=data||[];
+  render();
+}
+
+function filteredColors(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase().trim();
+  let arr=colors.filter(c=>[c.brand,c.store_number,c.product_code,c.color_number,c.color_name,c.color_book,c.replacement,c.notes]
+    .join(' ').toLowerCase().includes(q));
+
+  if(filter==='low') arr=arr.filter(isLow);
+  if(filter==='out') arr=arr.filter(isOut);
+  if(filter==='missing') arr=arr.filter(isMissing);
+  return arr;
+}
+
+function render(){
+  document.getElementById('sTotal').textContent=colors.length;
+  document.getElementById('sLow').textContent=colors.filter(isLow).length;
+  document.getElementById('sOut').textContent=colors.filter(isOut).length;
+  document.getElementById('sMissing').textContent=colors.filter(isMissing).length;
+
+  const q=(document.getElementById('search').value||'').trim();
+  document.getElementById('clearSearch').style.display=q?'block':'none';
+
+  const arr=filteredColors();
+  const titles={all:'全部颜色',low:'库存偏低',out:'已缺货',missing:'缺少配套'};
+  document.getElementById('sectionTitle').textContent=(titles[filter]||'All Colors')+' · '+arr.length;
+
+  const list=document.getElementById('list');
+  if(!arr.length){
+    list.innerHTML='<div class="empty">'+(q?'没有找到符合搜索的颜色':'这里暂时没有颜色')+'</div>';
+    return;
+  }
+
+  list.innerHTML=arr.map(c=>`
+    <div class="card" onclick="openDetail('${c.id}')">
+      ${c.photo_url?`<img class="swatch" src="${esc(c.photo_url)}" alt="">`:`<div class="swatch"></div>`}
+      <div class="meta">
+        <b>${esc(c.store_number||'—')} · ${esc(c.color_name)}</b><small>${esc(c.brand)} · 进货编码：${esc(c.product_code||c.color_number||'—')}</small>
+        <small>Gel：${esc(statusZh(c.gel_stock))} · 普通甲油：${esc(statusZh(c.regular_stock))}</small>
+        <div class="badges">
+          <span class="badge ${isMissing(c)?'bad':'ok'}">${isMissing(c)?'缺少配套':'配套 ✓'}</span>
+          ${isLow(c)?'<span class="badge warn">库存偏低</span>':''}
+          ${isOut(c)?'<span class="badge bad">缺货</span>':''}
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>`).join('');
+}
+
+document.getElementById('search').addEventListener('input',render);
+
+function clearSearchBox(){
+  document.getElementById('search').value='';
+  render();
+}
+function setFilter(f){
+  filter=f;
+  render();
+  document.getElementById('sectionTitle').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function showAll(){
+  filter='all';
+  document.getElementById('search').value='';
+  render();
+}
+function setNav(name){
+  ['Home','Colors','Buy','Scan'].forEach(n=>document.getElementById('nav'+n)?.classList.remove('active'));
+  document.getElementById('nav'+name)?.classList.add('active');
+}
+function goHome(){showAll();setNav('Home');window.scrollTo({top:0,behavior:'smooth'})}
+function goColors(){setFilter('all');setNav('Colors')}
+
+function clearForm(){
+  ['fBrand','fStoreNum','fProductCode','fName','fBook','fReplacement','fNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fGel').value='Plenty';
+  document.getElementById('fRegular').value='Plenty';
+  document.getElementById('photoInput').value='';
+  document.getElementById('photoPreview').src='';
+  document.getElementById('photoPreview').style.display='none';
+  document.getElementById('ocrStatus').style.display='none';
+  document.getElementById('ocrStatus').textContent='';
+  editingId=null;
+  currentPhotoUrl='';
+  currentPhotoFile=null;
+}
+
+function openAdd(scan){
+  clearForm();
+  document.getElementById('addTitle').textContent=scan?'📷 Scan Color':'➕ Add Color';
+  document.getElementById('camBox').style.display=scan?'block':'none';
+  document.getElementById('addModal').style.display='flex';
+  setNav(scan?'Scan':'Colors');
+}
+
+function editColor(id){
+  const c=colors.find(x=>x.id===id);if(!c)return;
+  clearForm();
+  editingId=id;
+  document.getElementById('addTitle').textContent='Edit Color';
+  document.getElementById('camBox').style.display='block';
+  document.getElementById('fBrand').value=c.brand||'';
+  document.getElementById('fStoreNum').value=c.store_number||'';
+  document.getElementById('fProductCode').value=c.product_code||c.color_number||'';
+  document.getElementById('fName').value=c.color_name||'';
+  document.getElementById('fGel').value=c.gel_stock||'Plenty';
+  document.getElementById('fRegular').value=c.regular_stock||'Plenty';
+  document.getElementById('fBook').value=c.color_book||'';
+  document.getElementById('fReplacement').value=c.replacement||'';
+  document.getElementById('fNotes').value=c.notes||'';
+  currentPhotoUrl=c.photo_url||'';
+
+  if(currentPhotoUrl){
+    const p=document.getElementById('photoPreview');
+    p.src=currentPhotoUrl;p.style.display='block';
+  }
+
+  closeModal('detailModal');
+  document.getElementById('addModal').style.display='flex';
+}
+
+async function uploadPhoto(){
+  if(!currentPhotoFile) return currentPhotoUrl||null;
+  const ext=(currentPhotoFile.name.split('.').pop()||'jpg').toLowerCase();
+  const path=`${currentUser.id}/${crypto.randomUUID()}.${ext}`;
+
+  const {error}=await sb.storage.from('color-photos').upload(path,currentPhotoFile,{upsert:false});
+  if(error) throw error;
+
+  const {data}=sb.storage.from('color-photos').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function saveColor(){
+  const brand=document.getElementById('fBrand').value.trim();
+  const storeNum=document.getElementById('fStoreNum').value.trim();
+  const productCode=document.getElementById('fProductCode').value.trim();
+  const name=document.getElementById('fName').value.trim();
+  if(!brand||!storeNum||!productCode||!name){alert('品牌、店内编号、厂家/进货编码、颜色名要填完整。');return}
+
+  const saveBtn=document.getElementById('saveBtn');
+  saveBtn.disabled=true;saveBtn.textContent='正在保存…';
+
+  try{
+    const photo_url=await uploadPhoto();
+    const payload={
+      user_id:currentUser.id,
+      brand,
+      color_number:productCode,
+      store_number:storeNum,
+      product_code:productCode,
+      color_name:name,
+      gel_stock:document.getElementById('fGel').value,
+      regular_stock:document.getElementById('fRegular').value,
+      color_book:document.getElementById('fBook').value.trim(),
+      replacement:document.getElementById('fReplacement').value.trim(),
+      notes:document.getElementById('fNotes').value.trim(),
+      photo_url
+    };
+
+    let res;
+    if(editingId) res=await sb.from('colors').update(payload).eq('id',editingId);
+    else res=await sb.from('colors').insert(payload);
+
+    if(res.error) throw res.error;
+
+    closeModal('addModal');
+    await loadColors();
+    showToast(editingId?'已更新颜色':'已保存到云端');
+  }catch(e){
+    alert('保存失败：'+e.message);
+  }finally{
+    saveBtn.disabled=false;saveBtn.textContent='✓ Save to Cloud';
+  }
+}
+
+function openDetail(id){
+  const c=colors.find(x=>x.id===id);if(!c)return;
+
+  document.getElementById('detail').innerHTML=`
+    <div class="detailHead">
+      ${c.photo_url?`<img class="detailImg" src="${esc(c.photo_url)}" alt="">`:`<div class="detailImg"></div>`}
+      <div>
+        <h3>${esc(c.color_name)}</h3>
+        <p>${esc(c.brand)} · 店内编号：${esc(c.store_number||'—')}</p>
+        <div class="badges"><span class="badge ${isMissing(c)?'bad':'ok'}">${isMissing(c)?'Missing Match':'Gel + Regular Match ✓'}</span></div>
+      </div>
+    </div>
+
+    <div class="detailRow"><span>厂家 / 进货编码</span><b>${esc(c.product_code||c.color_number||'—')}</b></div>
+    <div class="detailRow"><span>Gel</span><b>${esc(statusZh(c.gel_stock))}</b></div>
+    <div class="detailRow"><span>普通甲油</span><b>${esc(statusZh(c.regular_stock))}</b></div>
+    <div class="detailRow"><span>色卡 / 位置</span><b>${esc(c.color_book||'—')}</b></div>
+    <div class="detailRow"><span>替代颜色</span><b>${esc(c.replacement||'—')}</b></div>
+    <div class="detailRow"><span>备注</span><b>${esc(c.notes||'—')}</b></div>
+
+    <div style="margin-top:13px;font-weight:850">Gel 快速修改库存</div>
+    <div class="statusGrid">
+      ${[['Plenty','充足'],['Half','一半'],['Low','偏低'],['Out','缺货']].map(([v,l])=>`<button onclick="quickStatus('${c.id}','gel_stock','${v}')">${l}</button>`).join('')}
+    </div>
+
+    <div style="margin-top:13px;font-weight:850">普通甲油快速修改库存</div>
+    <div class="statusGrid">
+      ${[['Plenty','充足'],['Half','一半'],['Low','偏低'],['Out','缺货']].map(([v,l])=>`<button onclick="quickStatus('${c.id}','regular_stock','${v}')">${l}</button>`).join('')}
+    </div>
+
+    <button class="primary" onclick="editColor('${c.id}')">编辑颜色</button>
+    <button class="secondary danger" onclick="deleteColor('${c.id}')">删除颜色</button>
+    <button class="secondary" onclick="closeModal('detailModal')">关闭</button>`;
+
+  document.getElementById('detailModal').style.display='flex';
+}
+
+async function quickStatus(id,key,val){
+  const {error}=await sb.from('colors').update({[key]:val}).eq('id',id);
+  if(error){alert('修改失败：'+error.message);return}
+  await loadColors();
+  openDetail(id);
+  showToast('库存已更新');
+}
+
+async function deleteColor(id){
+  if(!confirm('确定删除这个颜色吗？')) return;
+  const {error}=await sb.from('colors').delete().eq('id',id);
+  if(error){alert('删除失败：'+error.message);return}
+  closeModal('detailModal');
+  await loadColors();
+  showToast('颜色已删除');
+}
+
+function shoppingItems(){
+  return colors.filter(c=>isLow(c)||isOut(c));
+}
+
+function showShopping(){
+  const arr=shoppingItems();
+  setNav('Buy');
+
+  document.getElementById('shopList').innerHTML=arr.length?arr.map(c=>{
+    const needs=[];
+    if(c.gel_stock==='Low'||c.gel_stock==='Out') needs.push('Gel：'+statusZh(c.gel_stock));
+    if(c.regular_stock==='Low'||c.regular_stock==='Out') needs.push('普通甲油：'+statusZh(c.regular_stock));
+    return `<div class="shopItem">
+      <div style="flex:1"><b>${esc(c.store_number||'—')} · ${esc(c.color_name)}</b><br><span class="muted">${esc(c.brand)} · ${esc(c.product_code||c.color_number||'—')}</span></div>
+      <div style="text-align:right;font-size:12px;font-weight:700">${needs.map(esc).join('<br>')}</div>
+    </div>`;
+  }).join(''):'<div class="empty">现在没有需要补货的颜色 🎉</div>';
+
+  document.getElementById('shopModal').style.display='flex';
+}
+
+async function copyShoppingList(){
+  const arr=shoppingItems();
+  if(!arr.length){showToast('现在没有补货项目');return}
+
+  const text=arr.map(c=>{
+    const needs=[];
+    if(c.gel_stock==='Low'||c.gel_stock==='Out') needs.push('Gel '+statusZh(c.gel_stock));
+    if(c.regular_stock==='Low'||c.regular_stock==='Out') needs.push('普通甲油 '+statusZh(c.regular_stock));
+    return `${c.store_number||'—'} - ${c.color_name} | ${c.brand} | 进货编码 ${c.product_code||c.color_number||'—'} (${needs.join(', ')})`;
+  }).join('\n');
+
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast('补货清单已复制');
+  }catch(e){
+    alert(text);
+  }
+}
+
+document.getElementById('photoInput').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  currentPhotoFile=file;
+
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const img=document.getElementById('photoPreview');
+    img.src=ev.target.result;img.style.display='block';
+
+    const st=document.getElementById('ocrStatus');
+    st.style.display='block';
+    st.textContent='正在处理瓶底标签…';
+
+    try{
+      const processed=await preprocessBottleLabel(ev.target.result);
+      const r=await Tesseract.recognize(processed,'eng',{
+        logger:m=>{
+          if(m.status==='recognizing text') st.textContent='正在识别… '+Math.round((m.progress||0)*100)+'%';
+        }
+      });
+
+      const parsed=parseNailLabel((r.data.text||'').trim());
+      const pieces=[];
+      if(parsed.brand) pieces.push('品牌：'+parsed.brand);
+      if(parsed.name) pieces.push('颜色名：'+parsed.name);
+      if(parsed.number) pieces.push('厂家/进货编码：'+parsed.number);
+
+      st.textContent=(pieces.length?'识别结果：\n'+pieces.join('\n'):'没有识别到清晰信息')+'\n\n请检查无误后保存。';
+
+      if(parsed.brand && !document.getElementById('fBrand').value) document.getElementById('fBrand').value=parsed.brand;
+      if(parsed.number) document.getElementById('fProductCode').value=parsed.number;
+      if(parsed.name) document.getElementById('fName').value=parsed.name;
+    }catch(err){
+      st.textContent='识别失败，可以手动输入。';
+    }
+  };
+
+  reader.readAsDataURL(file);
+});
+
+function preprocessBottleLabel(dataUrl){
+  return new Promise((resolve,reject)=>{
+    const im=new Image();
+    im.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const ctx=canvas.getContext('2d');
+      const side=Math.min(im.width,im.height)*0.74;
+      const sx=(im.width-side)/2;
+      const sy=(im.height-side)/2;
+      const target=1200;
+
+      canvas.width=target;canvas.height=target;
+      ctx.drawImage(im,sx,sy,side,side,0,0,target,target);
+
+      const imageData=ctx.getImageData(0,0,target,target);
+      const d=imageData.data;
+
+      for(let i=0;i<d.length;i+=4){
+        let gray=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+        gray=(gray-128)*1.8+128;
+        if(gray>220)gray=255;
+        if(gray<50)gray=0;
+        gray=Math.max(0,Math.min(255,gray));
+        d[i]=d[i+1]=d[i+2]=gray;
+      }
+
+      ctx.putImageData(imageData,0,0);
+      resolve(canvas.toDataURL('image/jpeg',0.94));
+    };
+    im.onerror=reject;
+    im.src=dataUrl;
+  });
+}
+
+function parseNailLabel(text){
+  const lines=text.split(/\n+/)
+    .map(x=>x.replace(/[^\x20-\x7E]/g,' ').replace(/\s+/g,' ').trim())
+    .filter(Boolean);
+
+  const joined=lines.join(' ');
+  const upper=joined.toUpperCase();
+
+  const brands=['OPI','DND','GELISH','KIARA SKY','APRES','CND','ESSIE'];
+  let brand=brands.find(b=>upper.includes(b))||'';
+  if(brand==='GELISH')brand='Gelish';
+  if(brand==='KIARA SKY')brand='Kiara Sky';
+  if(brand==='APRES')brand='Aprés';
+
+  let number='';
+  const explicit=joined.match(/\b(?:GC|NL|ISL)\s*[-#]?\s*([A-Z]?\d{2,4})\b/i);
+  if(explicit) number=explicit[1].toUpperCase();
+
+  if(!number){
+    const simple=joined.match(/\b[A-Z]\d{2,3}\b/i);
+    if(simple) number=simple[0].toUpperCase();
+  }
+
+  if(!number){
+    const nums=joined.match(/\b\d{2,4}\b/g)||[];
+    number=(nums.find(x=>!/^20\d{2}$/.test(x)&&x.length<=3)||'');
+  }
+
+  const junk=/PAT\.?|PATENT|PEND|MADE|USA|CHINA|PROFESSIONAL|LACQUER|POLISH|SOAK|OFF|UV|LED|WWW|COM|FL\.?\s*OZ|ML|WARNING|CAUTION/i;
+
+  const candidates=lines
+    .filter(line=>line.length>=4&&line.length<=42)
+    .filter(line=>!junk.test(line))
+    .filter(line=>!/^\W*\d[\d\s.,/#-]*$/.test(line))
+    .map(line=>{
+      const letters=(line.match(/[A-Za-z]/g)||[]).length;
+      const digits=(line.match(/\d/g)||[]).length;
+      const words=line.split(/\s+/).length;
+      let score=letters*2+words*4-digits*6;
+      if(/^[A-Z][A-Z '\-]+$/.test(line))score+=10;
+      return {line,score};
+    })
+    .sort((a,b)=>b.score-a.score);
+
+  let name=candidates[0]?.line||'';
+  name=name.replace(/\b(?:GC|NL|ISL)\s*[A-Z]?\d{2,4}\b/ig,'').replace(/\s+/g,' ').trim();
+
+  if(name&&name===name.toUpperCase()) name=name.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+
+  return {brand,number,name};
+}
+
+sb.auth.onAuthStateChange(async(event,session)=>{
+  currentUser=session?.user||null;
+  document.getElementById('authView').style.display=currentUser?'none':'block';
+  document.getElementById('mainView').style.display=currentUser?'block':'none';
+  document.getElementById('bottomNav').style.display=currentUser?'grid':'none';
+
+  if(currentUser){
+    document.getElementById('userLine').textContent=currentUser.email+' · 已同步';
+    await loadColors();
+  }else{
+    colors=[];
+  }
+});
+
+(async()=>{
+  const {data}=await sb.auth.getSession();
+  currentUser=data.session?.user||null;
+
+  if(currentUser){
+    document.getElementById('authView').style.display='none';
+    document.getElementById('mainView').style.display='block';
+    document.getElementById('bottomNav').style.display='grid';
+    document.getElementById('userLine').textContent=currentUser.email+' · 已同步';
+    await loadColors();
+  }
+})();
+</script>
+</body>
+</html>
